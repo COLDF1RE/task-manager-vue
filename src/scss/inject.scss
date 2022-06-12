@@ -1,0 +1,111 @@
+@import './mixins';
+
+///////////////////// RESET ////////////////////////
+html{
+    box-sizing: border-box;
+}
+
+*,
+*::after,
+*::before{
+    box-sizing: inherit;
+}
+
+ul[class],
+ol[class],
+button,
+fieldset,{
+    padding: 0;
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul,
+ol,
+li,
+figure,
+figcaption,
+blockquote,
+dl,
+dd,
+button,
+fieldset,{
+    margin: 0;
+}
+
+ul[class] {
+    list-style: none;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+input,
+button,
+textarea,
+select {
+    font: inherit;
+}
+
+a{
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+button {
+    background-color: transparent;
+    cursor: pointer;
+}
+
+select,
+input,
+button,
+textarea,
+fieldset{
+    border: none;
+}
+
+label {
+    display: block;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6, {
+    font-size: inherit;
+    font-weight: inherit;
+}
+
+
+///////////////////////// GLOBAL ////////////////////////////
+body {
+    font-family: 'Roboto', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 19px;
+    background-color: #E5E5E5;
+    //filter: invert(100%);
+}
+#root {
+    //background-color: #E5E5E5;
+}
+
+
+
+/////////////////////////// MEDIA //////////////////////////////
+@media (max-width: 1600px) {
+
+}

@@ -1,0 +1,50 @@
+<template>
+  <div :class="menuActive ? 'menu menu--active' : 'menu'">
+    <ul class="menu__list">
+      <slot></slot>
+    </ul>
+  </div>
+</template>
+
+<script>
+export default {
+  props: {
+    menuActive: {
+      type: Boolean,
+      required: true,
+    }
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+.menu {
+  position: absolute;
+  z-index: 1;
+  padding: 2.5px 0;
+  top: 0;
+  right: 0;
+  background-color: #ffffff;
+  box-shadow: 0 0 2px 2px rgba(123, 97, 255, 0.5);
+  border-radius: 5px;
+  color: #333333;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  line-height: 14px;
+  display: none;
+  &--active {
+    display: block;
+  }
+  &__list {}
+  &__list-item {
+    padding: 2.5px 5px;
+    list-style-type: none;
+    white-space: nowrap;
+    width: 100%;
+    display: flex;
+  }
+  &__list-item:hover {
+    background-color: #E6E1FF;
+  }
+}
+</style>
