@@ -75,6 +75,7 @@
 
     <Board>
       <div class="task-open">
+
         <div class="task-open__info">
           <h4 class="task-open__info-title">Исполнитель</h4>
           <p class="task-open__info-text">
@@ -93,30 +94,27 @@
 
           <h4 class="task-open__info-title">Приоритет</h4>
           <p class="task-open__info-text">
-            {{
-              (currentTask.rank === 'low' && 'Низкий') || (currentTask.rank === 'medium' && 'Средний') || (currentTask.rank === 'high' && 'Высокий')
-            }}
+            {{ (currentTask.rank === 'low' && 'Низкий') || (currentTask.rank === 'medium' && 'Средний') || (currentTask.rank === 'high' && 'Высокий') }}
           </p>
 
           <h4 class="task-open__info-title">Дата создания</h4>
           <p class="task-open__info-text">{{ dateOfCreation }}</p>
+
           <h4 class="task-open__info-title">Дата изменения</h4>
           <p class="task-open__info-text">{{ dateOfUpdate }}</p>
+
           <h4 class="task-open__info-title">Затрачено времени</h4>
           <p class="task-open__info-text">{{ timeIsSpent }}</p>
 
-          <MyButton class="task-open__info-bnt button--primary"
-                    @click="setModalActive(true)"
-          >
-            Сделать запись о работе
-          </MyButton>
-
+          <MyButton class="task-open__info-bnt button--primary" @click="toggleModal">Сделать запись о работе</MyButton>
         </div>
+
 
         <div class="task-open__description">
           <h4 class="task-open__description-title">Описание</h4>
           <p class="task-open__description-text">{{ currentTask.description }}</p>
         </div>
+
 
         <div class="task-open__comments">
           <h4 class="task-open__comments-title">{{ `Комментарии (${comments.length})` }}</h4>
@@ -142,43 +140,49 @@
       </div>
     </Board>
 
-    <!--    <Modal modalActive={modalActive} setModalActive={setModalActive}>-->
-    <!--      <form className="" onSubmit={handleSubmit}>-->
-    <!--        <h2 className="modal__window-title">Запись о работе</h2>-->
-    <!--        <div className="modal__window-body">-->
 
-    <!--          <label htmlFor="timeInMinutes" className="modal__window-subtitle">Затраченное время</label>-->
-    <!--          <input-->
-    <!--              id="timeInMinutes"-->
-    <!--              className="modal__window-input"-->
-    <!--              onChange={handleFieldChangeWorktime}-->
-    <!--              name="timeInMinutes"-->
-    <!--              value={worktimeForm.timeInMinutes}-->
-    <!--              required-->
-    <!--              type="number"-->
-    <!--          />-->
+    <Modal v-show="isShowModal" :show="isShowModal" @close="toggleModal">
+      <form>
+        <h2 class="modal__window-title">Запись о работе</h2>
+        <div class="modal__window-body">
+          <label class="modal__window-subtitle">Затраченное время</label>
+          <MyInput
+              class="modal__window-input"
+              v-model="worktimeForm.timeInMinutes"
+              type="number"
+          />
 
-    <!--          <label htmlFor='measureUnit' className="modal__window-subtitle">Единицы измерения</label>-->
-    <!--          <Dropdown change={handleFieldChangeWorktime} form={worktimeForm} values={measureUnit} title={measureUnitTitle} clickInsideCloseMenu={true} inputType={'radio'} className={'modal__window-select'}/>-->
+          <label class="modal__window-subtitle">Единицы измерения</label>
 
-    <!--            <label htmlFor='comment' className="modal__window-subtitle">Комментарии</label>-->
-    <!--            <textarea-->
-    <!--                id="comment"-->
-    <!--                className="modal__window-textarea"-->
-    <!--                onChange={handleFieldChangeWorktime}-->
-    <!--                name="comment"-->
-    <!--                value={worktimeForm.comment}-->
-    <!--                required-->
-    <!--            />-->
-    <!--        </div>-->
-    <!--        <div className="modal__window-buttons">-->
-    <!--          <button type="submit" className="modal__window-submit button button&#45;&#45;primary">Добавить</button>-->
-    <!--          <button className="modal__window-cancel button button-default"-->
-    <!--                  onClick={() => setModalActive(false)}>Отмена-->
-    <!--          </button>-->
-    <!--        </div>-->
-    <!--      </form>-->
-    <!--    </Modal>-->
+          <Dropdown class="modal__window-select">
+            <template #title>
+              {{ getDropdownTitle(worktimeForm.measureUnit, '', measureUnit) }}
+            </template>
+            <template #list>
+              <Checkbox v-for="[key, value] in Object.entries(measureUnit)"
+                        :key="key"
+                        :value="key"
+                        :title="value"
+                        inputType="radio"
+                        :checkedItems="worktimeForm.measureUnit"
+                        @change="setWorktimeFormMeasure"
+              />
+            </template>
+          </Dropdown>
+
+          <label class="modal__window-subtitle">Комментарии</label>
+          <MyTextarea
+              class="modal__window-textarea"
+              v-model="worktimeForm.comment"
+              required
+          />
+        </div>
+        <div class="modal__window-buttons">
+          <MyButton class="modal__window-submit button--primary" @click="changeWorkTime">Добавить</MyButton>
+          <MyButton class="modal__window-cancel button--default" @click="toggleModal">Отмена</MyButton>
+        </div>
+      </form>
+    </Modal>
   </div>
 </template>
 
@@ -192,37 +196,40 @@ import moment from "moment";
 import "moment/locale/ru";
 import MyTextarea from "../components/UI/MyTextarea";
 import Board from "../components/UI/Board";
+import MyInput from "../components/UI/MyInput";
 
 
 export default {
-  components: {Board, MyTextarea, MyButton, Status, BoardHeader},
+  components: {MyInput, Board, MyTextarea, MyButton, Status, BoardHeader},
   data() {
     return {
       currentTask: [],
+      comments: [],
       userId: localStorage.getItem('userId'),
+      isShowModal: false,
 
       opened: [{value: 'inProgress', name: 'Взять в работу'}, {value: 'complete', name: 'Отметить как выполненное'}],
       inProgress: [{value: 'opened', name: 'Заново открыть'}, {value: 'testing',name: 'Взять на тестирование'}, {value: 'complete', name: 'Отметить как выполненное'}],
       testing: [{value: 'opened', name: 'Заново открыть'}, {value: 'complete', name: 'Отметить как выполненное'}],
       complete: [{value: 'opened', name: 'Заново открыть'}],
 
-      measureUnit: [{value: 'minutes', name: 'Минуты'}, {value: 'hours', name: 'Часы'}, {value: 'days', name: 'Дни'},],
-      measureUnitTitle: {defaultName: 'Выбрать', name: 'measureUnit'},
+      measureUnit: {
+        minutes: 'Минуты',
+        hours: 'Часы',
+        days: 'Дни',
+      },
 
       dateOfCreation: '',
       dateOfUpdate: '',
       timeIsSpent: '',
 
-      comments: [],
-
-      modal: '',
-
       worktimeForm: {
         timeInMinutes: 0,
         comment: "",
         currentUser: localStorage.getItem('userId'),
-        measureUnit: '',
+        measureUnit: 'minutes',
       },
+
       commentForm: {
         taskId: this.$route.params.id,
         userId: localStorage.getItem('userId'),
@@ -300,25 +307,38 @@ export default {
 
 
     // WORKTIME-MODAL
-    handleFieldChangeWorktime(evt) {
-      const {name, value} = evt.target
-      this.worktimeForm = ({...this.worktimeForm, [name]: value})
+    toggleModal() {
+      this.isShowModal = !this.isShowModal;
     },
-    async handleSubmit(evt) {
-      evt.preventDefault()
-      await events.changeWorkTimeTask(id, {
-        timeInMinutes: worktimeForm.measureUnit === 'days' && worktimeForm.timeInMinutes * 1440 || worktimeForm.measureUnit === 'hours' && worktimeForm.timeInMinutes * 60 || worktimeForm.timeInMinutes,
-        comment: worktimeForm.comment,
-        currentUser: worktimeForm.currentUser,
+
+    async changeWorkTime(evt) {
+      // evt.preventDefault()
+      await this.$api.Events.changeWorkTime(this.currentTask.id, {
+        timeInMinutes: (this.worktimeForm.measureUnit === 'days' && this.worktimeForm.timeInMinutes * 1440) || (this.worktimeForm.measureUnit === 'hours' && this.worktimeForm.timeInMinutes * 60) || (this.worktimeForm.timeInMinutes),
+        comment: this.worktimeForm.comment,
+        currentUser: this.worktimeForm.currentUser,
       })
-      await events.getComments(id)
-      setModalActive(false)
-      setWorktimeForm({
+      await this.getComments()
+      await this.getCurrentTask()
+
+      this.isShowModal = false
+      this.worktimeForm = {
         timeInMinutes: 0,
         comment: "",
         currentUser: localStorage.getItem('userId'),
         measureUnit: '',
-      })
+      }
+    },
+
+    getDropdownTitle (arr, defaultTitle, constsObj) {
+      if (arr.length === 0) {
+        return defaultTitle
+      } else {
+        return constsObj[arr]
+      }
+    },
+    setWorktimeFormMeasure(value){
+      this.worktimeForm.measureUnit = value
     },
 
     minutesToDHM(time) {
@@ -401,9 +421,6 @@ export default {
       margin-bottom: 5px;
     }
     &-textarea {
-      //box-shadow: inset 0 0 2px 1px #B5B5B5;
-      //border-radius: 3px;
-      //width: 100%;
       height: 75px;
       margin-bottom: 10px;
     }

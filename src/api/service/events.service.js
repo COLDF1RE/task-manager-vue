@@ -43,7 +43,7 @@ export default api => {
             })
         },
 
-        changeWorkTime(taskId){
+        changeWorkTime(taskId, data){
             return api.instance.request({
                 method: 'patch',
                 url: 'tasks/' + taskId + '/worktime',

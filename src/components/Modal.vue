@@ -21,11 +21,22 @@ export default {
       type: Boolean,
     }
   },
+  mounted() {
+    window.addEventListener('keydown', this.escCloseModal);
+  },
+  destroy() {
+    window.removeEventListener('keydown', this.escCloseModal);
+  },
   methods: {
-    hideModal() {
-      this.$emit('show', false)
-    }
-  }
+    closeModal() {
+      this.$emit('close');
+    },
+    escCloseModal(e) {
+      if (this.show && e.key === 'Escape') {
+        this.closeModal();
+      }
+    },
+  },
 }
 </script>
 

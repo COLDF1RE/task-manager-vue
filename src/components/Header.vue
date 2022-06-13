@@ -54,7 +54,7 @@
       <Menu :menuActive="menuActive">
         <li>
           <a class="menu__list-item"
-             @click="$router.push('users/' + userId)"
+             @click="$router.push('/users/' + userId)"
           >
             Посмотреть профиль
           </a>

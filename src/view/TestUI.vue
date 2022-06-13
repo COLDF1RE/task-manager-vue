@@ -96,26 +96,19 @@
 
     <h2 class="ui-page__subtitle">Modal:</h2>
     <MyButton @click="toggleModal" class="button--default">Open Modal</MyButton>
-    <Modal2
-        v-show="isShowModal"
-        :show="isShowModal"
-        :scrollable="true"
-        header-id="modalHeader"
-        body-id="modalBody"
-        @close="toggleModal"
-    >
-      <template #header>
-        Заголовок
-      </template>
-
-      <template #body>
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequuntur debitis deserunt
-          doloremque ducimus eum facilis iure labore laborum, odio officia optio pariatur, placeat
-          quos rem, rerum sapiente sed temporibus velit.
-        </p>
-      </template>
-    </Modal2>
+    <Modal v-show="isShowModal" :show="isShowModal" @close="toggleModal">
+      <h3 class="modal__window-title">Редактирование пользователя</h3>
+      <div class="modal__window-body">
+        <label class="modal__window-subtitle">Имя пользователя</label>
+        <MyInput class="modal__window-input"/>
+        <label class="modal__window-subtitle">О себе</label>
+        <MyTextarea class="modal__window-textarea"/>
+      </div>
+      <div class="modal__window-buttons">
+        <MyButton class="modal__window-cancel button--primary" @click="toggleModal">Кнопка</MyButton>
+        <MyButton class="modal__window-cancel button--default" @click="toggleModal">Отмена</MyButton>
+      </div>
+    </Modal>
 
 
     <h2 class="ui-page__subtitle">Pagination:</h2>
@@ -135,8 +128,7 @@ import Menu from "../components/UI/Menu";
 import Dropdown from "../components/UI/Dropdown";
 import Checkbox from "../components/UI/Checkbox";
 export default {
-  components: {
-    Checkbox, Dropdown, Menu, MyInput, Status, Rank, MyButton, MyTextarea, Pagination},
+  components: {Checkbox, Dropdown, Menu, MyInput, Status, Rank, MyButton, MyTextarea, Pagination},
   data() {
     return{
       type: {

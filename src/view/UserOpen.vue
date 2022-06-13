@@ -5,11 +5,8 @@
         <h1 class="board-header__info-title">{{ currentUser.username }}</h1>
       </template>
       <template #options>
-        <MyButton @click="$router.push('/tasks/event/')" class="board-header__options-btn button--default">
-          Добавить задачу
-        </MyButton>
-        <MyButton @click="toggleModal" class="board-header__options-btn button--primary">Редактировать
-        </MyButton>
+        <MyButton @click="$router.push('/tasks/event/')" class="board-header__options-btn button--default">Добавить задачу</MyButton>
+        <MyButton @click="toggleModal" class="board-header__options-btn button--primary">Редактировать</MyButton>
       </template>
     </BoardHeader>
 
@@ -39,92 +36,36 @@
       </div>
     </Board>
 
-    <Modal2
-        v-show="isShowModal"
-        :show="isShowModal"
-        :scrollable="true"
-        header-id="modalHeader"
-        body-id="modalBody"
-        @close="toggleModal"
-    >
-      <template #header>
+    <Modal v-show="isShowModal" :show="isShowModal" @close="toggleModal">
+      <form>
         <h3 class="modal__window-title">Редактирование пользователя</h3>
-      </template>
-
-      <template #body>
-
         <div class="modal__window-body">
-
           <label class="modal__window-subtitle">Имя пользователя</label>
           <MyInput
               class="modal__window-input"
-              :value="currentUser.username"
+              v-model="form.username"
               required
           />
 
-          <label htmlFor="photoUrl" class="modal__window-subtitle">URL фотографии</label>
+          <label class="modal__window-subtitle">URL фотографии</label>
           <MyInput
               class="modal__window-input"
-              :value=currentUser.photoUrl
+              v-model="form.photoUrl"
           />
 
-          <label htmlFor="about" class="modal__window-subtitle">О себе</label>
+          <label class="modal__window-subtitle">О себе</label>
           <MyTextarea
               class="modal__window-textarea"
-              :value="currentUser.about"
+              v-model="form.about"
           />
 
         </div>
         <div class="modal__window-buttons">
-          <MyButton class="modal__window-submit button--primary">Добавить</MyButton>
-          <MyButton class="modal__window-cancel button-default" @click="toggleModal">Отмена</MyButton>
+          <MyButton class="modal__window-submit button--primary" @click="editUser">Добавить</MyButton>
+          <MyButton class="modal__window-cancel button--default" @click="toggleModal">Отмена</MyButton>
         </div>
-
-      </template>
-    </Modal2>
-
-<!--        <Modal >-->
-<!--          <form>-->
-<!--            <h3 class="modal__window-title">Редактирование пользователя</h3>-->
-
-<!--            <div class="modal__window-body">-->
-
-<!--              <label class="modal__window-subtitle">Имя пользователя</label>-->
-<!--              <input-->
-<!--                  id="username"-->
-<!--                  class="modal__window-input"-->
-<!--                  onChange={handleFieldChange}-->
-<!--                  name="username"-->
-<!--                  value={form.username}-->
-<!--                  required-->
-<!--              />-->
-
-<!--              <label htmlFor="photoUrl" class="modal__window-subtitle">URL фотографии</label>-->
-<!--              <input-->
-<!--                  id="photoUrl"-->
-<!--                  class="modal__window-input"-->
-<!--                  onChange={handleFieldChange}-->
-<!--                  name="photoUrl"-->
-<!--                  value={form.photoUrl}-->
-<!--              />-->
-
-<!--              <label htmlFor="about" class="modal__window-subtitle">О себе</label>-->
-<!--              <textarea-->
-<!--                  id="about"-->
-<!--                  class="modal__window-textarea"-->
-<!--                  onChange={handleFieldChange}-->
-<!--                  name="about"-->
-<!--                  value={form.about}-->
-<!--              />-->
-
-<!--            </div>-->
-<!--            <div class="modal__window-buttons">-->
-<!--              <button class="modal__window-submit button button&#45;&#45;primary">Добавить</button>-->
-<!--              <button class="modal__window-cancel button button-default" onClick={()=>setModalActive(false)}>Отмена</button>-->
-<!--            </div>-->
-<!--          </form>-->
-<!--        </Modal>-->
-
+      </form>
+    </Modal>
 
   </div>
 </template>
@@ -141,26 +82,27 @@ import MyModal from "../components/Modal";
 import EmptyList from "../components/EmptyList";
 import MyInput from "../components/UI/MyInput";
 import MyTextarea from "../components/UI/MyTextarea";
+import Modal from "../components/Modal";
 
 export default {
-  components: {MyTextarea, MyInput, EmptyList, MyModal, Board, TaskItem, Pagination, MyButton, BoardHeader},
+  components: {Modal, MyTextarea, MyInput, EmptyList, MyModal, Board, TaskItem, Pagination, MyButton, BoardHeader},
   data() {
     return {
       currentUser: {},
       tasks: [],
       defaultAvatar: 'https://mustact.by/img/empty/artist.avatar.png',
 
-      isShowModal: true,
+      isShowModal: false,
       isTaskLoading: false,
 
-      // form: {
-      //   id: this.currentUser.id,
-      //   login: this.currentUser.login,
-      //   username: this.currentUser.username,
-      //   about: this.currentUser.about !== null ? this.currentUser.about : "",
-      //   photoUrl: this.currentUser.photoUrl !== null ? this.currentUser.photoUrl : "",
-      //   password: "123",
-      // },
+      form: {
+        id: '',
+        login: '',
+        username: '',
+        about: '',
+        photoUrl: '',
+        password: "123",
+      },
 
       filter: {
         query: "",
@@ -188,6 +130,11 @@ export default {
       // totalPages: 0,
     }
   },
+  watch:{
+    currentUser(){
+      this.form = {...this.currentUser, password: '123'}
+    }
+  },
   mounted() {
     this.setActiveTab('users')
     this.$api.Events.getCurrentUser(this.$route.params.id)
@@ -210,20 +157,15 @@ export default {
       this.form = ({...this.form, [name]: value})
       console.log('form editUser: ',this.form)
     },
-    handleSubmit(evt) {
-      evt.preventDefault()
-      events.editUser(this.form)
+    editUser(evt) {
+      this.$api.Events.editUser(this.form)
       localStorage.setItem('userPhotoUrl', this.form.photoUrl)
-      setModalActive(false)
-      console.log('submit form editUser: ', this.form)
+      localStorage.setItem('username', this.form.username)
+      this.isShowModal = false
     },
-    // showModal: function () {
-    //   this.$refs.modal.show = true
-    // },
     toggleModal() {
       this.isShowModal = !this.isShowModal;
     },
-
   }
 }
 </script>
