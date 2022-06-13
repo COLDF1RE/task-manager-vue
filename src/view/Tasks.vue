@@ -22,7 +22,7 @@
         <EmptyList v-if="!loading && !tasksSliced.length"/>
       </Wrapper>
 
-      <Pagination :page="page" :limit="limit" :total="total" :firstIndex="firstIndex" :lastIndex="lastIndex"/>
+      <Pagination v-on:newPage="setPage($event)" :paging="paging"/>
     </Board>
   </div>
 </template>
@@ -79,6 +79,7 @@ export default {
       handler: function () {
         this.paging.lastIndex = this.paging.page * this.paging.limit
         this.paging.firstIndex = this.paging.lastIndex - this.paging.limit
+        this.tasksSliced = this.tasks.data.slice(this.paging.firstIndex, this.paging.lastIndex)
       },
       deep: true
     }
