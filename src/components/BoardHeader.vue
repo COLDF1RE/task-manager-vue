@@ -21,6 +21,7 @@ export default {
 .board-header {
   padding: 30px 20px 20px;
   max-width: 1320px;
+  min-height: 80px;
   display: flex;
   justify-content: space-between;
   align-items: center;
