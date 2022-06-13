@@ -34,7 +34,7 @@ import Wrapper from "../components/UI/Wrapper";
 import EmptyList from "../components/EmptyList";
 import Pagination from "../components/UI/Pagination";
 export default {
-  components: {Pagination, EmptyList, Wrapper, Pagination2, Board, UserItem, BoardHeader},
+  components: {Pagination, EmptyList, Wrapper, Board, UserItem, BoardHeader},
   data(){
     return {
       paging: {
