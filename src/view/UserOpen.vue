@@ -120,19 +120,25 @@ export default {
         firstIndex: 0,
         lastIndex: 10,
       },
-
-      // firstIndex: 0,
-      // lastIndex: 10,
-      //
-      // page: 1,
-      // limit: 10,
-      // total: 0,
-      // totalPages: 0,
     }
   },
   watch:{
     currentUser(){
       this.form = {...this.currentUser, password: '123'}
+    },
+    tasks(){
+      this.paging.lastIndex = this.paging.page * this.paging.limit
+      this.paging.firstIndex = this.paging.lastIndex - this.paging.limit
+      // this.tasksSliced = this.tasks.data.slice(this.paging.firstIndex, this.paging.lastIndex)
+      this.paging.total = this.tasks.length
+    },
+    paging:{
+      handler: function () {
+        this.paging.lastIndex = this.paging.page * this.paging.limit
+        this.paging.firstIndex = this.paging.lastIndex - this.paging.limit
+        // this.tasksSliced = this.tasks.data.slice(this.paging.firstIndex, this.paging.lastIndex)
+      },
+      deep: true
     }
   },
   mounted() {
@@ -152,11 +158,11 @@ export default {
   },
   methods: {
     ...mapActions(['fetchTasks', 'setActiveTab']),
-    handleFieldChange(evt){
-      const {name, value} = evt.target
-      this.form = ({...this.form, [name]: value})
-      console.log('form editUser: ',this.form)
-    },
+    // handleFieldChange(evt){
+    //   const {name, value} = evt.target
+    //   this.form = ({...this.form, [name]: value})
+    //   console.log('form editUser: ',this.form)
+    // },
     editUser(evt) {
       this.$api.Events.editUser(this.form)
       localStorage.setItem('userPhotoUrl', this.form.photoUrl)
@@ -165,6 +171,9 @@ export default {
     },
     toggleModal() {
       this.isShowModal = !this.isShowModal;
+    },
+    setPage(evn){
+      this.paging.page = evn
     },
   }
 }

@@ -68,17 +68,13 @@ export default {
     nextPage() {
       this.page += 1
       this.$emit('newPage', this.page)
-      this.setInfo()
     },
     setInfo(){
-      if(this.paging.total >= this.paging.firstIndex + 1 - this.paging.lastIndex){
-        this.info = ('Показано ' + this.paging.lastIndex + ' из ' + this.total)
-      } else {
-        this.info = ('Показано ' + this.paging.total + ' из ' + this.paging.total)
-      }
+      this.info = (`Показано ${this.firstIndex + 1} - ${this.lastIndex <= this.total ? this.lastIndex : this.total} из ${this.total}`)
     }
   },
   mounted() {
+    this.totalPages = Math.ceil(this.total / this.limit)
     this.setInfo()
 
     this.page = this.paging.page
@@ -86,7 +82,6 @@ export default {
     this.total = this.paging.total
     this.firstIndex = this.paging.firstIndex
     this.lastIndex = this.paging.lastIndex
-    // this.totalPages = 3
   },
 
   watch: {
@@ -101,7 +96,7 @@ export default {
         this.total = this.paging.total
         this.firstIndex = this.paging.firstIndex
         this.lastIndex = this.paging.lastIndex
-        // this.totalPages = 3
+        this.setInfo()
       },
       deep: true
     }

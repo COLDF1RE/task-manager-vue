@@ -29,7 +29,7 @@ import BoardHeader from "../components/BoardHeader";
 import UserItem from "../components/UserItem";
 import {mapActions, mapGetters} from "vuex";
 import Board from "../components/UI/Board";
-import Pagination2 from "../components/UI/Pagination2";
+
 import Wrapper from "../components/UI/Wrapper";
 import EmptyList from "../components/EmptyList";
 import Pagination from "../components/UI/Pagination";
